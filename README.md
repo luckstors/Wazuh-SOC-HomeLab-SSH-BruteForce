@@ -1,5 +1,4 @@
 # Wazuh-SOC-HomeLab-SSH-BruteForce
-A self-built SOC home lab simulating SSH brute-force attacks against a Windows endpoint, detecting them via Wazuh SIEM, and executing incident response.
 # 🛡️ SOC Home Lab: Detecting SSH Brute Force Attacks on Windows with Wazuh SIEM
 
 [![Wazuh](https://img.shields.io/badge/SIEM-Wazuh%204.x-blue)]()
@@ -38,18 +37,18 @@ Most companies can't defend against what they can't see. This lab simulates that
 ## 💻 Lab Architecture
 
 ```
-┌─────────────────┐        SSH (port 22)        ┌──────────────────────┐
-│   Kali Linux     │ ───────────────────────────▶│   Windows 11 Target   │
-│  (Attacker Node)  │         Hydra brute force    │  (OpenSSH + Wazuh     │
-│  IP: 10.x.x.x*    │                              │   Agent)               │
-└─────────────────┘                              │  IP: 10.x.x.x*         │
-                                                   └──────────┬───────────┘
+┌──────────────────┐       SSH (port 22)        ┌─────────────────────────┐
+│   Kali Linux     │ ─────────────────────────▶│   Windows 11 Target     │
+│  (Attacker Node) │          Hydra brute force │    (OpenSSH + Wazuh     │
+│  IP: 10.x.x.x*   │                            │         Agent)          │
+└──────────────────┘                            │   IP: 10.x.x.x*         │
+                                                └──────────┬──────────────┘
                                                               │ Event forwarding
                                                               ▼
                                                    ┌──────────────────────┐
-                                                   │   Wazuh Manager        │
-                                                   │   (Ubuntu/Docker)      │
-                                                   │   IP: 10.x.x.x*        │
+                                                   │   Wazuh Manager      │
+                                                   │   (Ubuntu/Docker)    │
+                                                   │   IP: 10.x.x.x*      │
                                                    └──────────────────────┘
 ```
 *\*IPs redacted — lab used private/isolated network ranges only (RFC1918). All testing performed on an isolated home lab network with no internet-facing exposure.*
