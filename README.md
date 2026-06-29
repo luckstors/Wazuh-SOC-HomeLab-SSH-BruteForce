@@ -6,7 +6,7 @@
 
 A self-built SOC home lab simulating an SSH brute-force attack against a Windows endpoint, detecting it via Wazuh SIEM, and executing incident response. Built to practice end-to-end detection engineering: attack simulation → log correlation → forensic triage → hardening.
 
-📝 **Full write-up (storytelling version):** *[Membangun SOC Home Lab Pertama: Mendeteksi Serangan Brute Force SSH dengan Wazuh SIEM](#)* on Medium
+📝 **Full write-up (storytelling version):** *[Membangun SOC Home Lab Pertama: Mendeteksi Serangan Brute Force SSH dengan Wazuh SIEM](https://medium.com/@rafifadillah.cybersec/membangun-soc-home-lab-pertama-deteksi-serangan-brute-force-ssh-dengan-wazuh-siem-bahasa-indonesia-a24c8682ea3d?sharedUserId=rafifadillah.cybersec)* on Medium
 
 ---
 
@@ -98,6 +98,7 @@ sudo service ssh status
 📸 *Screenshot: terminal confirming `ssh.service` is `active (running)`*
 
 ---
+![alt text](https://github.com/luckstors/Wazuh-SOC-HomeLab-SSH-BruteForce/blob/main/Public/Medium%20-%20sshStatusActive.png?raw=true)
 
 ### Phase 2 — Simulate the Attack (Kali Linux)
 
@@ -115,6 +116,8 @@ This was run in **two separate passes** — the first using a wordlist that happ
 
 📸 *Screenshot: Kali terminal showing both Hydra runs (credentials and target IP redacted)*
 
+![alt text](https://github.com/luckstors/Wazuh-SOC-HomeLab-SSH-BruteForce/blob/main/Public/Medium%20-%20hydra50test.png?raw=true)
+
 ---
 
 ### Phase 3 — Detection & Forensic Analysis (Wazuh Dashboard)
@@ -123,6 +126,7 @@ This was run in **two separate passes** — the first using a wordlist that happ
 The Wazuh threat-hunting dashboard showed a sharp spike in `authentication_failed` events on the timestamp histogram — the first visual indicator of an active brute-force attempt, alongside a smaller but notable count of `authentication_success` events.
 
 📸 *Screenshot: dashboard summary — total alerts, authentication failure/success counters, and top alert groups*
+![alt text](https://github.com/luckstors/Wazuh-SOC-HomeLab-SSH-BruteForce/blob/main/Public/Medium%20-%20wazuhDashboard.png?raw=true)
 
 **2. Event correlation — two-stage attack pattern**
 
@@ -135,12 +139,15 @@ Drilling into the Security event log revealed two distinct stages of the attack:
 | `60115` | User account locked out (multiple login errors) | **Stage 2** — a second, all-incorrect attempt run triggered Windows' native Account Lockout Policy |
 
 📸 *Screenshot: chronological alert list showing the Stage 1 → Stage 2 sequence*
+![alt text](https://github.com/luckstors/Wazuh-SOC-HomeLab-SSH-BruteForce/blob/main/Public/Medium%20-%20WazuhThreatHunting.png?raw=true)
+![alt text](https://github.com/luckstors/Wazuh-SOC-HomeLab-SSH-BruteForce/blob/main/Public/Medium%20-%20LogActivityWazuh1.png?raw=true)
 
 **3. Forensic drill-down (raw event detail)**
 
 Pivoting into the raw JSON of the underlying Windows Security event (Event ID `4740` — *account locked out*) surfaces the fields a SOC analyst would use to trace the source of an attack in a real investigation: the **Account Name** of the affected/targeted account, and the **Caller Computer Name** / **Source Network Address** identifying where the request originated from.
 
 📸 *Screenshot: raw JSON log detail — account name, domain, and source identifiers redacted*
+![alt text](https://github.com/luckstors/Wazuh-SOC-HomeLab-SSH-BruteForce/blob/main/Public/Medium%20-%20LogActivityWazuh.png?raw=true)
 
 > 🔒 **Sensor note:** This is the single most important screenshot to redact carefully before publishing. Raw JSON event dumps routinely contain the real account name, real hostname, and internal domain/workgroup name in plaintext. Crop or black out `Account Name`, `Caller Computer Name`, and any `Security ID` (SID) strings before sharing — these directly fingerprint your machine and username.
 
